@@ -87,3 +87,5 @@ crashlytics-build.properties
 .vscode/*
 .idea/*
 *_BurstDebugInformation_DoNotShip/*
+Assets/Resources/ElevenLabsConfig.asset
+Assets/Resources/ElevenLabsConfig.asset.meta
