@@ -4,16 +4,13 @@ using UnityEngine;
 [RequireComponent(typeof(AudioSource))]
 public class PcmAudioPlayer : MonoBehaviour
 {
-    private Queue<AudioClip> clipQueue = new Queue<AudioClip>();
+    private readonly Queue<AudioClip> clipQueue = new Queue<AudioClip>();
     private AudioSource audioSource;
     private const int SampleRate = 16000;
 
-    void Awake()
-    {
-        audioSource = GetComponent<AudioSource>();
-    }
+    private void Awake() => audioSource = GetComponent<AudioSource>();
 
-    void Update()
+    private void Update()
     {
         if (!audioSource.isPlaying && clipQueue.Count > 0)
         {
@@ -24,26 +21,25 @@ public class PcmAudioPlayer : MonoBehaviour
 
     public void EnqueueBase64Audio(string base64Audio)
     {
-        byte[] audioBytes = System.Convert.FromBase64String(base64Audio);
-        int samples = audioBytes.Length / 2;
-        float[] floatSamples = new float[samples];
+        byte[] bytes   = System.Convert.FromBase64String(base64Audio);
+        int    samples = bytes.Length / 2;
+        float[] floats = new float[samples];
 
         for (int i = 0; i < samples; i++)
         {
-            short sample = (short)((audioBytes[i * 2 + 1] << 8) | audioBytes[i * 2]);
-            floatSamples[i] = sample / 32768f;
+            short sample  = (short)((bytes[i * 2 + 1] << 8) | bytes[i * 2]);
+            floats[i]     = sample / 32768f;
         }
 
-        AudioClip clip = AudioClip.Create("ElevenLabsClip", samples, 1, SampleRate, false);
-        clip.SetData(floatSamples, 0);
+        var clip = AudioClip.Create("ElevenLabsClip", samples, 1, SampleRate, false);
+        clip.SetData(floats, 0);
         clipQueue.Enqueue(clip);
     }
 
-    public void Stop()
+    /** Clears queue and stops playback immediately */
+    public void StopImmediately()
     {
         clipQueue.Clear();
         audioSource.Stop();
     }
-
-    public bool IsPlaying => audioSource.isPlaying || clipQueue.Count > 0;
 }
