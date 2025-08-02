@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 namespace ElevenLabs
 {
@@ -7,27 +8,27 @@ namespace ElevenLabs
     /// Handles playback of PCM audio received as Base64-encoded strings.
     /// Uses an internal queue to play audio clips sequentially through an AudioSource.
     /// </summary>
-    [RequireComponent(typeof(AudioSource))]
     public class PcmAudioPlayer : MonoBehaviour
     {
+        [SerializeField] private AudioSource audioSource;
+        
         private readonly Queue<AudioClip> _clipQueue = new();
-        private AudioSource _audioSource;
         private const int SampleRate = 16000;
 
         #region Unity Lifecycle
 
-        private void Awake()
+        private void Start()
         {
-            _audioSource = GetComponent<AudioSource>();
+            Assert.IsNotNull(audioSource, "Audio source is required");
         }
 
         private void Update()
         {
-            if (_audioSource.isPlaying || _clipQueue.Count == 0)
+            if (audioSource.isPlaying || _clipQueue.Count == 0)
                 return;
 
-            _audioSource.clip = _clipQueue.Dequeue();
-            _audioSource.Play();
+            audioSource.clip = _clipQueue.Dequeue();
+            audioSource.Play();
         }
 
         #endregion
@@ -66,7 +67,7 @@ namespace ElevenLabs
         public void StopImmediately()
         {
             _clipQueue.Clear();
-            _audioSource.Stop();
+            audioSource.Stop();
         }
 
         #endregion

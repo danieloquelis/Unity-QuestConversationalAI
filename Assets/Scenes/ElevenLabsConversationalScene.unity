@@ -1254,6 +1254,14 @@ PrefabInstance:
       propertyPath: config
       value: 
       objectReference: {fileID: 11400000, guid: defbd4c51c4a0433393c1f5917aef5a9, type: 2}
+    - target: {fileID: 3328899402220159382, guid: 8c82bfc5a37004e5d9ac2087ae10b8dc, type: 3}
+      propertyPath: agentId
+      value: cdY8NbrSKrVhrtMOKX9c
+      objectReference: {fileID: 0}
+    - target: {fileID: 5718490224308063795, guid: 8c82bfc5a37004e5d9ac2087ae10b8dc, type: 3}
+      propertyPath: audioSource
+      value: 
+      objectReference: {fileID: 8031151055887882123}
     - target: {fileID: 6031310780746407371, guid: 8c82bfc5a37004e5d9ac2087ae10b8dc, type: 3}
       propertyPath: m_Name
       value: AgentConversationManager
@@ -1303,6 +1311,11 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 8c82bfc5a37004e5d9ac2087ae10b8dc, type: 3}
+--- !u!82 &8031151055887882123 stripped
+AudioSource:
+  m_CorrespondingSourceObject: {fileID: 1451157276864586681, guid: 8c82bfc5a37004e5d9ac2087ae10b8dc, type: 3}
+  m_PrefabInstance: {fileID: 8031151055887882122}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

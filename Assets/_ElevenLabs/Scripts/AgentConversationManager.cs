@@ -1,11 +1,13 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using System.Threading.Tasks;
 using NativeWebSocket;
 using Newtonsoft.Json;
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace ElevenLabs
 {
@@ -13,16 +15,21 @@ namespace ElevenLabs
     {
         [Header("Agent Configuration")]
         [SerializeField] private string agentId = "<your_agent_id>";
+        [SerializeField] private bool startOnAwake = true;
 
         [Header("Dependencies")]
         [SerializeField] private ElevenLabsConfig config;
         [SerializeField] private MicrophoneStreamer micStreamer;
         [SerializeField] private PcmAudioPlayer audioPlayer;
 
+        public UnityEvent<string> onAgentTranscript;
+        public UnityEvent<string> onUserTranscript;
+        
         private WebSocket _websocket;
         private Coroutine _activityPingRoutine;
-        
-        private async void Start()
+
+        [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
+        public async void StartAgent()
         {
             try
             {
@@ -37,6 +44,14 @@ namespace ElevenLabs
             {
                 Debug.LogError($"[AgentConversationManager] Startup failed: {e}");
                 enabled = false;
+            }
+        } 
+        
+        private void Start()
+        {
+            if (startOnAwake)
+            {
+                StartAgent();
             }
         }
 
@@ -96,14 +111,10 @@ namespace ElevenLabs
 
         private async Task SafeCloseSocket()
         {
-            try
+            if (_websocket != null && _websocket.State != WebSocketState.Closed)
             {
-                if (_websocket != null && _websocket.State != WebSocketState.Closed)
-                {
-                    await _websocket.Close();
-                }
+                await _websocket.Close();
             }
-            catch { /* ignored */ }
         }
         
         private async Task SendInitiationData()
@@ -124,9 +135,7 @@ namespace ElevenLabs
                 yield return new WaitForSecondsRealtime(20f);
             }
         }
-
-        /* ---------------------- Inbound events --------------------------- */
-
+        
         private void HandleRawMessage(byte[] bytes)
         {
             HandleMessage(Encoding.UTF8.GetString(bytes));
@@ -134,9 +143,9 @@ namespace ElevenLabs
 
         private async void HandleMessage(string message)
         {
-            var evt = JsonConvert.DeserializeObject<BaseEvent>(message);
+            var eventPayload = JsonConvert.DeserializeObject<BaseEvent>(message);
 
-            switch (evt.Type)
+            switch (eventPayload.Type)
             {
                 case "ping":
                     await HandlePingEvent(message);
@@ -144,11 +153,17 @@ namespace ElevenLabs
                 case "audio":
                     HandleAudioEvent(message);
                     break;
+                case "user_transcript":
+                    HandleUserTranscriptEvent(message);
+                    break;
+                case "agent_response":
+                    HandleAgentResponseEvent(message);
+                    break;
                 case "interruption":
                     audioPlayer.StopImmediately();
                     break;
                 default:
-                    Debug.Log($"Unhandled event type: {evt.Type}");
+                    Debug.Log($"Unhandled event type: {eventPayload.Type}");
                     break;
             }
         }
@@ -173,7 +188,29 @@ namespace ElevenLabs
         {
             var ar = JsonConvert.DeserializeObject<AudioResponseEvent>(msg);
             if (!string.IsNullOrEmpty(ar.AudioEvent?.AudioBase64))
+            {
                 audioPlayer.EnqueueBase64Audio(ar.AudioEvent.AudioBase64);
+            }
+        }
+
+        private void HandleUserTranscriptEvent(string msg)
+        {
+            var data = JsonConvert.DeserializeObject<UserTranscriptEvent>(msg);
+            var transcript = data.UserTranscriptionEvent?.UserTranscript;
+            if (!string.IsNullOrEmpty(transcript))
+            {
+                onUserTranscript?.Invoke(transcript);    
+            }
+        }
+        
+        private void HandleAgentResponseEvent(string msg)
+        {
+            var data = JsonConvert.DeserializeObject<AgentResponseEvent>(msg);
+            var transcript = data.AgentResponseEventData?.AgentResponse;
+            if (!string.IsNullOrEmpty(transcript))
+            {
+                onAgentTranscript?.Invoke(transcript);    
+            }
         }
     }
 }
