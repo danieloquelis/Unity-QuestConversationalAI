@@ -22,6 +22,8 @@ namespace ElevenLabs
         [SerializeField] private MicrophoneStreamer micStreamer;
         [SerializeField] private PcmAudioPlayer audioPlayer;
 
+        [Header("Events")]
+        public UnityEvent<float> onAgentVadScore;
         public UnityEvent<string> onAgentTranscript;
         public UnityEvent<string> onUserTranscript;
         
@@ -159,6 +161,9 @@ namespace ElevenLabs
                 case "agent_response":
                     HandleAgentResponseEvent(message);
                     break;
+                case "vad_score":
+                    HandleAgentVadScoreEvent(message);
+                    break;
                 case "interruption":
                     audioPlayer.StopImmediately();
                     break;
@@ -210,6 +215,16 @@ namespace ElevenLabs
             if (!string.IsNullOrEmpty(transcript))
             {
                 onAgentTranscript?.Invoke(transcript);    
+            }
+        }
+
+        private void HandleAgentVadScoreEvent(string msg)
+        {
+            var data = JsonConvert.DeserializeObject<VadScoreEvent>(msg);
+            var vadScore = data.VadScoreEventData?.VadScore;
+            if (vadScore.HasValue)
+            {
+                onAgentVadScore?.Invoke(vadScore.Value);
             }
         }
     }

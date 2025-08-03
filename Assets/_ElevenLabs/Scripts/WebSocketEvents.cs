@@ -46,6 +46,18 @@ namespace ElevenLabs
         public string AgentResponse { get; set; }
     }
 
+    public class VadScoreEvent : BaseEvent
+    {
+        [JsonProperty("vad_score_event")]
+        public VadScoreEventData VadScoreEventData { get; set; }
+    }
+
+    public class VadScoreEventData
+    {
+        [JsonProperty("vad_score")]
+        public float VadScore { get; set; }
+    }
+
     public class AgentResponseCorrectionEvent : BaseEvent
     {
         [JsonProperty("agent_response_correction_event")]
