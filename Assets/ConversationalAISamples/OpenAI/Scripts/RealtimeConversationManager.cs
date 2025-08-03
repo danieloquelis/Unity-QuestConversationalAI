@@ -4,55 +4,65 @@ using System.Text;
 using System.Threading.Tasks;
 using NativeWebSocket;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using UnityEngine;
 using UnityEngine.Events;
 
 namespace OpenAI
 {
-    /// <summary>
-    /// Unity 6 client for the OpenAI Realtime (beta) WebSocket API.
-    ///  ✔ sends input_audio_buffer.append events (24 kHz PCM16 in Base64)
-    ///  ✔ waits for session.created before starting the mic
-    ///  ✔ plays response.audio.delta chunks on the fly
-    ///  ✔ emits agent/user transcript events
-    /// </summary>
     public class RealtimeConversationManager : MonoBehaviour
     {
-        /* ------------------------------ Inspector ------------------------------ */
+        #region Inspector
 
         [Header("Model")]
         [SerializeField] private string model = "gpt-4o-realtime-preview-2025-06-03";
+
+        [Header("Optional system prompt")]
+        [TextArea(2, 4)]
+        [SerializeField] private string systemPrompt =
+            "You are a helpful assistant who answers briefly.";
+
+        [Header("Startup")]
         [SerializeField] private bool startOnAwake = true;
 
         [Header("Dependencies")]
-        [SerializeField] private OpenAIConfig     config;
+        [SerializeField] private OpenAIConfig       config;
         [SerializeField] private MicrophoneStreamer micStreamer;
         [SerializeField] private PcmAudioPlayer     audioPlayer;
 
         [Header("Unity Events")]
         public UnityEvent<string> onAgentTranscript;
         public UnityEvent<string> onUserTranscript;
-        public UnityEvent<float>  onAgentVadScore;
+        public UnityEvent<bool>   onUserSpeaking;
+        public UnityEvent<bool>   onAgentSpeaking;
 
-        /* ------------------------------ Internals ------------------------------ */
+        #endregion
 
-        private WebSocket  _ws;
-        private bool       _sessionReady;
+        #region Internals
 
-        /* ---------------------------------------------------------------------- */
-        /*                             Life-cycle                                 */
-        /* ---------------------------------------------------------------------- */
+        private WebSocket _ws;
+        private bool      _sessionReady;
+        private bool      _agentCurrentlySpeaking;
+
+        #endregion
+
+        #region Unity lifecycle
 
         private void Start()
         {
             if (startOnAwake) StartAgent();
         }
 
-        private void Update() => _ws?.DispatchMessageQueue();
+        private void Update()
+        {
+            _ws?.DispatchMessageQueue();
+        }
 
-        private async void OnDisable()  { await GracefulShutdown(); }
-        private async void OnApplicationQuit() { await GracefulShutdown(); }
+        private async void OnDisable()         => await Shutdown();
+        private async void OnApplicationQuit() => await Shutdown();
+
+        #endregion
+
+        #region Public API
 
         public async void StartAgent()
         {
@@ -60,156 +70,137 @@ namespace OpenAI
             {
                 var url = $"{config.realtimeConvWebsocketUrl}?model={Uri.EscapeDataString(model)}";
 
-                /* ------------ OpenAI requires two headers ------------------ */
                 var headers = new Dictionary<string, string>
                 {
                     { "Authorization", $"Bearer {config.apiKey}" },
-                    { "OpenAI-Beta",  "realtime=v1" }
+                    { "OpenAI-Beta",   "realtime=v1" }
                 };
 
                 _ws = new WebSocket(url, headers);
-                _ws.OnOpen    += OnSocketOpen;
-                _ws.OnClose   += OnSocketClose;
+                _ws.OnOpen    += () => Debug.Log("[OpenAI] WS connected.");
+                _ws.OnClose   += code => Debug.Log($"[OpenAI] WS closed ({code})");
                 _ws.OnMessage += OnSocketMessage;
 
-                /* delegate for mic chunks ---------------------------------- */
-                micStreamer.OnAudioChunk += HandleMicChunk;
+                micStreamer.OnAudioChunk += SendMicChunk;
 
                 await _ws.Connect();
             }
             catch (Exception ex)
             {
-                Debug.LogError($"[OpenAI-Realtime] Failed to start: {ex}");
+                Debug.LogError($"[OpenAI] Startup failed: {ex}");
                 enabled = false;
             }
         }
 
-        /* ---------------------------------------------------------------------- */
-        /*                             WebSocket                                  */
-        /* ---------------------------------------------------------------------- */
+        #endregion
 
-        private async Task GracefulShutdown()
+        #region Shutdown
+
+        private async Task Shutdown()
         {
+            micStreamer.OnAudioChunk -= SendMicChunk;
+            micStreamer.StopStreaming();
+            audioPlayer.StopImmediately();
+
             if (_ws != null && _ws.State != WebSocketState.Closed)
                 await _ws.Close();
-
-            micStreamer.OnAudioChunk -= HandleMicChunk;
-            micStreamer.StopStreaming();
-            audioPlayer.StopImmediately();
         }
 
-        private void OnSocketOpen()
-        {
-            Debug.Log("[OpenAI-Realtime] WS connected, waiting for session.created …");
-        }
+        #endregion
 
-        private void OnSocketClose(WebSocketCloseCode code)
-        {
-            Debug.Log($"[OpenAI-Realtime] WS closed ({code})");
-            micStreamer.StopStreaming();
-            audioPlayer.StopImmediately();
-            micStreamer.OnAudioChunk -= HandleMicChunk;
-        }
+        #region WebSocket receive
 
         private void OnSocketMessage(byte[] raw)
         {
-            var json = Encoding.UTF8.GetString(raw);
-            var evt  = JObject.Parse(json);
-            string type = evt.Value<string>("type");
-            Debug.Log($"EVENT ===> {evt}");
-            switch (type)
+            var text    = Encoding.UTF8.GetString(raw);
+            var baseEvt = JsonConvert.DeserializeObject<BaseEvent>(text);
+
+            switch (baseEvt.Type)
             {
-                /* -------- connection / housekeeping -------- */
                 case "session.created":
-                    HandleSessionCreated();
+                    _sessionReady = true;
+                    SendSystemPrompt();
+                    micStreamer.StartStreaming();
                     break;
-                /* -------- user → server echo  -------------- */
+
                 case "conversation.item.input_audio_transcription.completed":
-                    ForwardUserTranscript(evt);
+                    var user = JsonConvert.DeserializeObject<InputAudioTranscriptDone>(text);
+                    onUserTranscript?.Invoke(user.Text);
                     break;
 
-                /* -------- assistant response --------------- */
                 case "response.audio.delta":
-                    PlayAgentAudioDelta(evt);
-                    break;
-                case "response.audio_transcript.delta":
-                    ForwardAgentTranscriptDelta(evt);
-                    break;
-                case "response.audio.done":
-                    /* nothing to do – clip already queued */
+                    if (!_agentCurrentlySpeaking)
+                    {
+                        _agentCurrentlySpeaking = true;
+                        onAgentSpeaking?.Invoke(true);
+                    }
+                    var audio = JsonConvert.DeserializeObject<ResponseAudioDelta>(text);
+                    audioPlayer.EnqueueBase64Audio(audio.DeltaBase64);
                     break;
 
-                /* -------- optional VAD scores -------------- */
+                case "response.audio.done":
+                    _agentCurrentlySpeaking = false;
+                    onAgentSpeaking?.Invoke(false);
+                    break;
+
+                case "response.audio_transcript.delta":
+                    var tx = JsonConvert.DeserializeObject<ResponseAudioTranscriptDelta>(text);
+                    onAgentTranscript?.Invoke(tx.DeltaText);
+                    break;
+
                 case "input_audio_buffer.speech_started":
+                    onUserSpeaking?.Invoke(true);
+                    break;
+
                 case "input_audio_buffer.speech_stopped":
-                    /* could drive UI, ignored here */
+                    onUserSpeaking?.Invoke(false);
+                    break;
+
+                case "error":
+                    var err = JsonConvert.DeserializeObject<ErrorEvent>(text);
+                    Debug.LogError($"[OpenAI] ERROR {err.Code}: {err.Message}");
                     break;
 
                 default:
-                    Debug.Log($"[OpenAI-Realtime] Unhandled event: {type}");
+                    Debug.Log($"[OpenAI] Unhandled: {baseEvt.Type}");
                     break;
             }
         }
 
-        private void HandleMicChunk(string base64)
+        #endregion
+
+        #region WebSocket send
+
+        private void SendMicChunk(string b64)
         {
             if (!_sessionReady || _ws.State != WebSocketState.Open) return;
 
             var payload = new Dictionary<string, object>
             {
                 { "type",  "input_audio_buffer.append" },
-                { "audio", base64 }
+                { "audio", b64 }
             };
+
             _ = _ws.SendText(JsonConvert.SerializeObject(payload));
         }
 
-        private void HandleSessionCreated()
+        private void SendSystemPrompt()
         {
-            Debug.Log("[OpenAI-Realtime] session.created received – starting mic.");
+            if (string.IsNullOrWhiteSpace(systemPrompt)) return;
 
-            /* Optionally tweak default session config (e.g., switch VAD off/on) */
-            var update = new Dictionary<string, object>
+            var upd = new Dictionary<string, object>
             {
                 { "type", "session.update" },
                 { "session", new Dictionary<string, object>
                     {
-                        { "modalities",         new[] { "audio", "text" } },
-                        { "input_audio_format",  "pcm16" },
-                        { "output_audio_format", "pcm16" },
-                        { "turn_detection", new Dictionary<string,object>
-                            { { "type", "server_vad" } } }
+                        { "instructions", systemPrompt }
                     }
                 }
             };
-            _ = _ws.SendText(JsonConvert.SerializeObject(update));
 
-            _sessionReady = true;
-            micStreamer.StartStreaming();
+            _ = _ws.SendText(JsonConvert.SerializeObject(upd));
         }
 
-        private void ForwardUserTranscript(JObject evt)
-        {
-            var delta = evt.SelectToken("$.text")?.ToString();
-            if (!string.IsNullOrEmpty(delta))
-                onUserTranscript?.Invoke(delta);
-        }
-
-        /* ---------------------------------------------------------------------- */
-        /*                      Assistant-side helpers                            */
-        /* ---------------------------------------------------------------------- */
-
-        private void PlayAgentAudioDelta(JObject evt)
-        {
-            string deltaB64 = evt.Value<string>("delta");
-            if (!string.IsNullOrEmpty(deltaB64))
-                audioPlayer.EnqueueBase64Audio(deltaB64);
-        }
-
-        private void ForwardAgentTranscriptDelta(JObject evt)
-        {
-            var text = evt.Value<string>("delta");
-            if (!string.IsNullOrEmpty(text))
-                onAgentTranscript?.Invoke(text);
-        }
+        #endregion
     }
 }
