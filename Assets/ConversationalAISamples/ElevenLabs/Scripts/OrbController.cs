@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.Assertions;
 
-namespace Common.Scripts {
+namespace ElevenLabs {
     public class OrbController : MonoBehaviour
     {
         [Header("User Speech Particles")]
