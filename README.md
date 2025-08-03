@@ -6,6 +6,14 @@ A Unity project showcasing **real-time conversational AI** with speech-to-speech
 
 As AI technology evolves, most conversational AI examples focus on text-to-speech, but the traditional process of speech-to-text → AI processing → text-to-speech introduces significant delays. This project showcases how to implement **true real-time speech-to-speech interactions** using WebSocket connections for bidirectional, low-latency communication.
 
+### ElevenLabs Demo
+
+https://github.com/user-attachments/assets/f09c0677-662b-4782-954c-8dd8d563d960
+
+### OpenAI Demo
+
+https://github.com/user-attachments/assets/f8d7c13e-5d02-4b15-9bea-eb8ead26bdba
+
 ## Features
 
 - **Real-time Speech-to-Speech**: Direct voice interaction without text conversion delays
@@ -15,7 +23,7 @@ As AI technology evolves, most conversational AI examples focus on text-to-speec
 - **Multiple AI Providers**: Support for both ElevenLabs and OpenAI real-time APIs
 - **Cross-Platform**: Works on both desktop and Meta Quest devices
 
-## 🛠️ Requirements
+## Requirements
 
 ### Software Requirements
 
