@@ -1,0 +1,34 @@
+{
+  "tools": [
+    {
+      "type": "function",
+      "name": "Actions_Start",
+      "description": "Start cube animation",
+      "parameters": {
+        "type": "object",
+        "properties": {}
+      }
+    },
+    {
+      "type": "function",
+      "name": "Actions_Stop",
+      "description": "Stop cube animation",
+      "parameters": {
+        "type": "object",
+        "properties": {}
+      }
+    },
+    {
+      "type": "function",
+      "name": "Actions_SetSpeed",
+      "description": "Set cube rotation speed (degrees per second)",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "speed": { "type": "number" }
+        },
+        "required": ["speed"]
+      }
+    }
+  ]
+}

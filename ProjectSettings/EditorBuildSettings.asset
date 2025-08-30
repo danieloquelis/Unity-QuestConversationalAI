@@ -5,14 +5,21 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 1
-    path: Assets/ConversationalAISamples/ElevenLabs/ElevenLabsConvAISample.unity
+  - enabled: 0
+    path: Assets/Samples/ElevenLabs/ElevenLabsConvAISample.unity
     guid: 99c9720ab356a0642a771bea13969a05
   - enabled: 0
-    path: Assets/ConversationalAISamples/OpenAI/OpenAIRealtimeConvSample.unity
+    path: Assets/Samples/OpenAI/RealtimeConvSample/RealtimeConvSample.unity
     guid: 169176ed3d3b44965819f9b5cedb1e81
+  - enabled: 0
+    path: Assets/Samples/OpenAI/AgenticToolsSample/AgenticToolsSample.unity
+    guid: 4bca4900a2bec4e8fbc1a66418cb3c8f
+  - enabled: 1
+    path: Assets/Samples/OpenAI/SimpleVoiceActionSample/SimpleVoiceActionsSample.unity
+    guid: 4367d57964faa4a6694259f19fa2299a
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
+    com.unity.xr.arfoundation.simulation_settings: {fileID: 11400000, guid: 9a0ac179be52a4479b274d97870723b6, type: 2}
     com.unity.xr.management.loader_settings: {fileID: 11400000, guid: d7ab3122ca938478786fb2139b3a35a1, type: 2}
     com.unity.xr.openxr.settings4: {fileID: 11400000, guid: 021717d036fdd4d7ab65f838ea4dee0c, type: 2}
   m_UseUCBPForAssetBundles: 0
