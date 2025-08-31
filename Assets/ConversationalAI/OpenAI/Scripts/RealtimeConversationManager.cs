@@ -35,6 +35,10 @@ namespace OpenAI
         [SerializeField] private MicrophoneStreamer micStreamer;
         [SerializeField] private PcmAudioPlayer     audioPlayer;
 
+        private enum ImageDetail { Low, High }
+        [Header("Vision (Image Input)")]
+        [SerializeField] private ImageDetail imageDetail = ImageDetail.High;
+
         [Header("Thinking SFX")]
         [SerializeField] private AudioSource thinkingAudioSource;
         [SerializeField] private AudioClip thinkingLoopClip;
@@ -82,7 +86,18 @@ namespace OpenAI
         #endregion
 
         #region Public API
-
+        
+        /// <summary>
+        /// Used to get image url added into conversation for image analysis
+        /// Check: https://openai.com/index/introducing-gpt-realtime/
+        /// </summary>
+        public static event Func<string> OnRequestImage; 
+        
+        
+        /// <summary>
+        /// Call this from any GameObject to start talking to the agent
+        /// Normally this is called on start if `startOnAwake` is set to true
+        /// </summary>
         public async void StartAgent()
         {
             try
@@ -99,6 +114,10 @@ namespace OpenAI
             }
         }
 
+        /// <summary>
+        /// Force stop agent
+        /// Used it to cancel any interaction and close the socket immediately
+        /// </summary>
         public void InterruptNow()
         {
             TryCancelAssistantResponse();
@@ -311,6 +330,27 @@ namespace OpenAI
             _responseActive = false;
             _responseCreateSent = false;
         }
+        
+        private static string GetImageDataUrlAsync()
+        {
+            if (OnRequestImage == null) return null;
+            
+            try
+            {
+                foreach (var d in OnRequestImage.GetInvocationList())
+                {
+                    var fn = (Func<string>)d;
+                    var s = fn();
+                    if (!string.IsNullOrWhiteSpace(s)) return s;
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.LogWarning($"[OpenAI] OnRequestImage failed: {ex.Message}");
+            }
+            
+            return null;
+        }
 
         #endregion
 
@@ -386,6 +426,43 @@ namespace OpenAI
             await _ws.SendText(create.ToString(Formatting.None));
         }
 
+        private async Task MaybeSendImageItemAsync()
+        {
+            if (_ws == null || _ws.State != WebSocketState.Open) return;
+
+            var dataUrl = GetImageDataUrlAsync();
+            if (string.IsNullOrWhiteSpace(dataUrl))
+            {
+                Debug.LogWarning("[OpenAI] Skipping image send: empty data URL from provider.");
+                return;
+            }
+
+            // Helpful debug for payload size without logging the full image
+            var approxKb = dataUrl.Length / 1024;
+            Debug.Log($"[OpenAI] Sending image data URL (~{approxKb} KB), detail={imageDetail.ToString().ToLowerInvariant()}");
+
+            var addImage = new JObject
+            {
+                ["type"] = "conversation.item.create",
+                ["item"] = new JObject
+                {
+                    ["type"]   = "message",
+                    ["role"]   = "user",
+                    ["content"] = new JArray
+                    {
+                        new JObject
+                        {
+                            ["type"] = "input_image",
+                            ["image_url"] = dataUrl,
+                            ["detail"] = imageDetail == ImageDetail.High ? "high" : "low"
+                        }
+                    }
+                }
+            };
+
+            await _ws.SendText(addImage.ToString(Formatting.None));
+        }
+        
         #endregion
 
         #region Helpers
@@ -464,9 +541,17 @@ namespace OpenAI
 
         private void HandleSpeechStarted() => onUserSpeaking?.Invoke(true);
 
-        private void HandleSpeechStopped()
+        private async void HandleSpeechStopped()
         {
             onUserSpeaking?.Invoke(false);
+
+            if (_ws != null && _ws.State == WebSocketState.Open)
+            {
+                var commit = new JObject { ["type"] = "input_audio_buffer.commit" };
+                await _ws.SendText(commit.ToString(Formatting.None));
+            }
+
+            await MaybeSendImageItemAsync();
             SendResponseCreate();
         }
 

@@ -14,9 +14,12 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Samples/OpenAI/AgenticToolsSample/AgenticToolsSample.unity
     guid: 4bca4900a2bec4e8fbc1a66418cb3c8f
-  - enabled: 1
+  - enabled: 0
     path: Assets/Samples/OpenAI/SimpleVoiceActionSample/SimpleVoiceActionsSample.unity
     guid: 4367d57964faa4a6694259f19fa2299a
+  - enabled: 1
+    path: Assets/Samples/OpenAI/PCAConversationalAISample/PCAConversationalAISample.unity
+    guid: f13b9b984d41f438789dbaf9689b583c
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
     com.unity.xr.arfoundation.simulation_settings: {fileID: 11400000, guid: 9a0ac179be52a4479b274d97870723b6, type: 2}
