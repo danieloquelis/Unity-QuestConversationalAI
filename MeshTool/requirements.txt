@@ -1,0 +1,8 @@
+trimesh==4.0.5
+websockets==12.0
+numpy==1.24.3
+scipy==1.11.4
+networkx==3.2.1
+pillow==10.1.0
+shapely==2.0.2
+mapbox-earcut==1.0.1

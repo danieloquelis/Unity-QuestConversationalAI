@@ -5,6 +5,7 @@ namespace LineArtTools
 	/// <summary>
 	/// Global settings and limits for LineArtTools. Stored as a ScriptableObject.
 	/// </summary>
+	[CreateAssetMenu(fileName = "LineArtToolsSettings", menuName = "LineArtTools/Settings", order = 1)]
 	public sealed class LineArtToolsSettings : ScriptableObject
 	{
 		private static LineArtToolsSettings _cachedInstance;

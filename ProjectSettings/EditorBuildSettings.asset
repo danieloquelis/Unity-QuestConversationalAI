@@ -12,7 +12,7 @@ EditorBuildSettings:
     path: Assets/Samples/OpenAI/RealtimeConvSample/RealtimeConvSample.unity
     guid: 169176ed3d3b44965819f9b5cedb1e81
   - enabled: 0
-    path: Assets/Samples/OpenAI/AgenticToolsSample/AgenticToolsSample.unity
+    path: Assets/Samples/OpenAI/AgenticToolsSample/LineArtToolsSample.unity
     guid: 4bca4900a2bec4e8fbc1a66418cb3c8f
   - enabled: 0
     path: Assets/Samples/OpenAI/SimpleVoiceActionSample/SimpleVoiceActionsSample.unity

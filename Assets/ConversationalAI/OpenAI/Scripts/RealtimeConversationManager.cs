@@ -64,7 +64,7 @@ namespace OpenAI
         private const double MinCreateIntervalSec = 0.2;
 
         private readonly ToolCallState _toolCalls = new ();
-        private int _thinkingDepth = 0;
+        private int _thinkingDepth;
 
         #endregion
 
@@ -157,7 +157,7 @@ namespace OpenAI
         {
             var text = Encoding.UTF8.GetString(raw);
 
-            BaseEvent baseEvt = null;
+            BaseEvent baseEvt;
             try { baseEvt = JsonConvert.DeserializeObject<BaseEvent>(text); }
             catch (Exception ex)
             {
@@ -433,13 +433,8 @@ namespace OpenAI
             var dataUrl = GetImageDataUrlAsync();
             if (string.IsNullOrWhiteSpace(dataUrl))
             {
-                Debug.LogWarning("[OpenAI] Skipping image send: empty data URL from provider.");
                 return;
             }
-
-            // Helpful debug for payload size without logging the full image
-            var approxKb = dataUrl.Length / 1024;
-            Debug.Log($"[OpenAI] Sending image data URL (~{approxKb} KB), detail={imageDetail.ToString().ToLowerInvariant()}");
 
             var addImage = new JObject
             {
@@ -683,6 +678,13 @@ namespace OpenAI
             var err = JsonConvert.DeserializeObject<ErrorEvent>(json);
             var code = err?.Error?.Code    ?? "(no code)";
             var msg  = err?.Error?.Message ?? "(no message)";
+            
+            // Avoid the warnings while agent is speaking.
+            if (code == "input_audio_buffer_commit_empty")
+            {
+                return;
+            }
+            
             Debug.LogError($"[OpenAI] ERROR {code}: {msg}");
             if (code == "conversation_already_has_active_response")
             {
