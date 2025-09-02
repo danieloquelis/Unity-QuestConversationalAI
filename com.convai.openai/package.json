@@ -1,0 +1,19 @@
+{
+  "name": "com.convai.openai",
+  "displayName": "ConversationalAI [OpenAI]",
+  "version": "1.0.0",
+  "unity": "6000.0",
+  "description": "A Unity package that enables real-time conversational AI interactions using OpenAI's Realtime API.",
+  "author": {
+    "name": "Daniel Oquelis",
+    "email": "daniel.oquelis@gmail.com",
+    "url": "https://github.com/danieloquelis"
+  },
+  "samples": [
+    {
+      "displayName": "Conversational AI Samples",
+      "description": "Please clone the main repository to access to samples",
+      "path": "Samples~/ConversationalSample"
+    }
+  ]
+}
