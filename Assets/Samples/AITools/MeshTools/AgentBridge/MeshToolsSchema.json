@@ -1,0 +1,387 @@
+{
+  "tools": [
+    {
+      "type": "function",
+      "name": "MeshTool_CreateBox",
+      "description": "Create a box/cube primitive mesh",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique identifier for the mesh"
+          },
+          "extents": {
+            "type": "array",
+            "items": { "type": "number" },
+            "minItems": 3,
+            "maxItems": 3,
+            "description": "Box dimensions [width, height, depth]"
+          }
+        },
+        "required": ["id"]
+      }
+    },
+
+    {
+      "type": "function",
+      "name": "MeshTool_CreateSphere",
+      "description": "Create a sphere primitive mesh",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique identifier for the mesh"
+          },
+          "radius": {
+            "type": "number",
+            "minimum": 0.1,
+            "maximum": 10.0,
+            "description": "Sphere radius"
+          },
+          "subdivisions": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 5,
+            "description": "Number of subdivisions for sphere detail"
+          }
+        },
+        "required": ["id"]
+      }
+    },
+
+    {
+      "type": "function",
+      "name": "MeshTool_CreateCylinder",
+      "description": "Create a cylinder primitive mesh",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique identifier for the mesh"
+          },
+          "radius": {
+            "type": "number",
+            "minimum": 0.1,
+            "maximum": 10.0,
+            "description": "Cylinder radius"
+          },
+          "height": {
+            "type": "number",
+            "minimum": 0.1,
+            "maximum": 20.0,
+            "description": "Cylinder height"
+          },
+          "sections": {
+            "type": "integer",
+            "minimum": 8,
+            "maximum": 64,
+            "description": "Number of circular sections"
+          }
+        },
+        "required": ["id"]
+      }
+    },
+
+    {
+      "type": "function",
+      "name": "MeshTool_CreateCapsule",
+      "description": "Create a capsule primitive mesh",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique identifier for the mesh"
+          },
+          "radius": {
+            "type": "number",
+            "minimum": 0.1,
+            "maximum": 10.0,
+            "description": "Capsule radius"
+          },
+          "height": {
+            "type": "number",
+            "minimum": 0.1,
+            "maximum": 20.0,
+            "description": "Capsule height"
+          }
+        },
+        "required": ["id"]
+      }
+    },
+
+    {
+      "type": "function",
+      "name": "MeshTool_CreateTorus",
+      "description": "Create a torus (donut) mesh",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique identifier for the mesh"
+          },
+          "major_radius": {
+            "type": "number",
+            "minimum": 0.5,
+            "maximum": 10.0,
+            "description": "Major radius of the torus"
+          },
+          "minor_radius": {
+            "type": "number",
+            "minimum": 0.1,
+            "maximum": 5.0,
+            "description": "Minor radius of the torus"
+          },
+          "major_sections": {
+            "type": "integer",
+            "minimum": 8,
+            "maximum": 64,
+            "description": "Number of sections around major radius"
+          },
+          "minor_sections": {
+            "type": "integer",
+            "minimum": 8,
+            "maximum": 32,
+            "description": "Number of sections around minor radius"
+          }
+        },
+        "required": ["id"]
+      }
+    },
+
+    {
+      "type": "function",
+      "name": "MeshTool_CreateIcosphere",
+      "description": "Create an icosphere (geodesic sphere) mesh",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique identifier for the mesh"
+          },
+          "radius": {
+            "type": "number",
+            "minimum": 0.1,
+            "maximum": 10.0,
+            "description": "Icosphere radius"
+          },
+          "subdivisions": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 4,
+            "description": "Number of subdivisions for detail"
+          }
+        },
+        "required": ["id"]
+      }
+    },
+
+    {
+      "type": "function",
+      "name": "MeshTool_BooleanUnion",
+      "description": "Combine two meshes using boolean union operation",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "mesh_a": {
+            "type": "string",
+            "description": "ID of the first mesh"
+          },
+          "mesh_b": {
+            "type": "string",
+            "description": "ID of the second mesh"
+          },
+          "result_id": {
+            "type": "string",
+            "description": "ID for the resulting mesh"
+          }
+        },
+        "required": ["mesh_a", "mesh_b", "result_id"]
+      }
+    },
+
+    {
+      "type": "function",
+      "name": "MeshTool_BooleanDifference",
+      "description": "Subtract one mesh from another using boolean difference",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "mesh_a": {
+            "type": "string",
+            "description": "ID of the base mesh"
+          },
+          "mesh_b": {
+            "type": "string",
+            "description": "ID of the mesh to subtract"
+          },
+          "result_id": {
+            "type": "string",
+            "description": "ID for the resulting mesh"
+          },
+          "hide_inputs": {
+            "type": "boolean",
+            "description": "Whether to hide input meshes after operation (default: true)",
+            "default": true
+          }
+        },
+        "required": ["mesh_a", "mesh_b", "result_id"]
+      }
+    },
+
+    {
+      "type": "function",
+      "name": "MeshTool_BooleanIntersection",
+      "description": "Find intersection of two meshes using boolean intersection",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "mesh_a": {
+            "type": "string",
+            "description": "ID of the first mesh"
+          },
+          "mesh_b": {
+            "type": "string",
+            "description": "ID of the second mesh"
+          },
+          "result_id": {
+            "type": "string",
+            "description": "ID for the resulting mesh"
+          }
+        },
+        "required": ["mesh_a", "mesh_b", "result_id"]
+      }
+    },
+
+    {
+      "type": "function",
+      "name": "MeshTool_TransformMesh",
+      "description": "Transform a mesh with translation, rotation, and/or scaling",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "mesh_id": {
+            "type": "string",
+            "description": "ID of the mesh to transform"
+          },
+          "result_id": {
+            "type": "string",
+            "description": "ID for the transformed mesh (optional, defaults to mesh_id)"
+          },
+          "translate": {
+            "type": "array",
+            "items": { "type": "number" },
+            "minItems": 3,
+            "maxItems": 3,
+            "description": "Translation vector [x, y, z]"
+          },
+          "rotate": {
+            "type": "object",
+            "properties": {
+              "axis": {
+                "type": "array",
+                "items": { "type": "number" },
+                "minItems": 3,
+                "maxItems": 3,
+                "description": "Rotation axis [x, y, z]"
+              },
+              "angle": {
+                "type": "number",
+                "description": "Rotation angle in radians"
+              }
+            },
+            "required": ["axis", "angle"]
+          },
+          "scale": {
+            "oneOf": [
+              {
+                "type": "number",
+                "description": "Uniform scale factor"
+              },
+              {
+                "type": "array",
+                "items": { "type": "number" },
+                "minItems": 3,
+                "maxItems": 3,
+                "description": "Non-uniform scale [x, y, z]"
+              }
+            ]
+          }
+        },
+        "required": ["mesh_id"]
+      }
+    },
+
+    {
+      "type": "function",
+      "name": "MeshTool_ExportMesh",
+      "description": "Export a mesh to file",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "mesh_id": {
+            "type": "string",
+            "description": "ID of the mesh to export"
+          },
+          "filename": {
+            "type": "string",
+            "description": "Output filename (without extension)"
+          },
+          "format": {
+            "type": "string",
+            "enum": ["glb", "obj", "stl", "ply"],
+            "description": "Export format"
+          }
+        },
+        "required": ["mesh_id"]
+      }
+    },
+
+    {
+      "type": "function",
+      "name": "MeshTool_GetMeshInfo",
+      "description": "Get information about a mesh",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "mesh_id": {
+            "type": "string",
+            "description": "ID of the mesh"
+          }
+        },
+        "required": ["mesh_id"]
+      }
+    },
+
+    {
+      "type": "function",
+      "name": "MeshTool_DeleteMesh",
+      "description": "Delete a mesh from memory",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "mesh_id": {
+            "type": "string",
+            "description": "ID of the mesh to delete"
+          }
+        },
+        "required": ["mesh_id"]
+      }
+    },
+
+    {
+      "type": "function",
+      "name": "MeshTool_GetConnectionStatus",
+      "description": "Check connection status to mesh tool server",
+      "parameters": {
+        "type": "object",
+        "properties": {}
+      }
+    }
+  ]
+}

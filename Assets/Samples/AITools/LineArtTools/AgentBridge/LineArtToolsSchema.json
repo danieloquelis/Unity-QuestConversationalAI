@@ -1,0 +1,389 @@
+{
+  "tools": [
+    {
+      "type": "function",
+      "name": "CharacterFactory_CreateStickFigure",
+      "description": "Create stick figure",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "color": { "type": "string" },
+          "scale": { "type": "number" }
+        },
+        "required": ["id"]
+      }
+    },
+
+    {
+      "type": "function",
+      "name": "LineArt_LineSegment",
+      "description": "Draw a line segment",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "a": {
+            "type": "array",
+            "items": { "type": "number" },
+            "minItems": 3,
+            "maxItems": 3
+          },
+          "b": {
+            "type": "array",
+            "items": { "type": "number" },
+            "minItems": 3,
+            "maxItems": 3
+          },
+          "width": { "type": "number" },
+          "color": { "type": "string" }
+        },
+        "required": ["id", "a", "b"]
+      }
+    },
+    {
+      "type": "function",
+      "name": "LineArt_Circle",
+      "description": "Draw a circle",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "center": {
+            "type": "array",
+            "items": { "type": "number" },
+            "minItems": 3,
+            "maxItems": 3
+          },
+          "radius": { "type": "number" },
+          "width": { "type": "number" },
+          "color": { "type": "string" },
+          "segments": { "type": "integer" }
+        },
+        "required": ["id", "center", "radius"]
+      }
+    },
+    {
+      "type": "function",
+      "name": "LineArt_PolylineBegin",
+      "description": "Begin polyline",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "width": { "type": "number" },
+          "color": { "type": "string" }
+        },
+        "required": ["id"]
+      }
+    },
+    {
+      "type": "function",
+      "name": "LineArt_PolylineAddVertex",
+      "description": "Add polyline vertex",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "p": {
+            "type": "array",
+            "items": { "type": "number" },
+            "minItems": 3,
+            "maxItems": 3
+          }
+        },
+        "required": ["id", "p"]
+      }
+    },
+    {
+      "type": "function",
+      "name": "LineArt_PolylineEnd",
+      "description": "End polyline",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "closed": { "type": "boolean" }
+        },
+        "required": ["id"]
+      }
+    },
+    {
+      "type": "function",
+      "name": "LineArt_BindEndpoints",
+      "description": "Bind a stroke to two transforms",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "aId": { "type": "string" },
+          "bId": { "type": "string" }
+        },
+        "required": ["id", "aId", "bId"]
+      }
+    },
+    {
+      "type": "function",
+      "name": "LineArt_FollowPoint",
+      "description": "Bind a stroke to follow a transform",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "targetId": { "type": "string" }
+        },
+        "required": ["id", "targetId"]
+      }
+    },
+    {
+      "type": "function",
+      "name": "LineArt_SetStyle",
+      "description": "Set stroke style",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "width": { "type": "number" },
+          "color": { "type": "string" },
+          "depthTest": { "type": "boolean" },
+          "dashed": { "type": "boolean" },
+          "dashSize": { "type": "number" },
+          "gapSize": { "type": "number" }
+        },
+        "required": ["id"]
+      }
+    },
+    {
+      "type": "function",
+      "name": "LineArt_Rotate",
+      "description": "Rotate a stroke around axes. Use either axis+degrees or euler[3]",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "axis": { "type": "string", "enum": ["x", "y", "z"] },
+          "degrees": { "type": "number" },
+          "euler": {
+            "type": "array",
+            "items": { "type": "number" },
+            "minItems": 3,
+            "maxItems": 3
+          }
+        },
+        "required": ["id"]
+      }
+    },
+    {
+      "type": "function",
+      "name": "LineArt_BezierQuadratic",
+      "description": "Draw a quadratic Bezier curve (p0,p1,p2)",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "p0": {
+            "type": "array",
+            "items": { "type": "number" },
+            "minItems": 3,
+            "maxItems": 3
+          },
+          "p1": {
+            "type": "array",
+            "items": { "type": "number" },
+            "minItems": 3,
+            "maxItems": 3
+          },
+          "p2": {
+            "type": "array",
+            "items": { "type": "number" },
+            "minItems": 3,
+            "maxItems": 3
+          },
+          "width": { "type": "number" },
+          "color": { "type": "string" },
+          "segments": { "type": "integer" }
+        },
+        "required": ["id", "p0", "p1", "p2"]
+      }
+    },
+    {
+      "type": "function",
+      "name": "LineArt_BezierCubic",
+      "description": "Draw a cubic Bezier curve (p0,p1,p2,p3)",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "p0": {
+            "type": "array",
+            "items": { "type": "number" },
+            "minItems": 3,
+            "maxItems": 3
+          },
+          "p1": {
+            "type": "array",
+            "items": { "type": "number" },
+            "minItems": 3,
+            "maxItems": 3
+          },
+          "p2": {
+            "type": "array",
+            "items": { "type": "number" },
+            "minItems": 3,
+            "maxItems": 3
+          },
+          "p3": {
+            "type": "array",
+            "items": { "type": "number" },
+            "minItems": 3,
+            "maxItems": 3
+          },
+          "width": { "type": "number" },
+          "color": { "type": "string" },
+          "segments": { "type": "integer" }
+        },
+        "required": ["id", "p0", "p1", "p2", "p3"]
+      }
+    },
+    {
+      "type": "function",
+      "name": "MRPlacement_PlaceOnNearestSurface",
+      "description": "Place scene root on nearest surface",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "sceneRootId": { "type": "string" },
+          "surface": { "type": "string", "enum": ["Table", "Floor", "Any"] },
+          "maxDistanceMeters": { "type": "number" },
+          "originId": { "type": "string" },
+          "originWorldPos": {
+            "type": "array",
+            "items": { "type": "number" },
+            "minItems": 3,
+            "maxItems": 3
+          }
+        },
+        "required": ["sceneRootId"]
+      }
+    },
+    {
+      "type": "function",
+      "name": "Animation_MoveTo",
+      "description": "Animate transform to world position",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "targetPos": {
+            "type": "array",
+            "items": { "type": "number" },
+            "minItems": 3,
+            "maxItems": 3
+          },
+          "duration": { "type": "number" },
+          "ease": { "type": "string" },
+          "channel": { "type": "string" }
+        },
+        "required": ["id", "targetPos"]
+      }
+    },
+    {
+      "type": "function",
+      "name": "Animation_TranslateBy",
+      "description": "Translate transform by delta",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "delta": {
+            "type": "array",
+            "items": { "type": "number" },
+            "minItems": 3,
+            "maxItems": 3
+          },
+          "duration": { "type": "number" },
+          "ease": { "type": "string" },
+          "channel": { "type": "string" }
+        },
+        "required": ["id", "delta"]
+      }
+    },
+    {
+      "type": "function",
+      "name": "Animation_OscillatePosition",
+      "description": "Oscillate position",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "axis": {
+            "type": "array",
+            "items": { "type": "number" },
+            "minItems": 3,
+            "maxItems": 3
+          },
+          "amplitude": { "type": "number" },
+          "frequency": { "type": "number" },
+          "phase": { "type": "number" },
+          "channel": { "type": "string" }
+        },
+        "required": ["id", "axis"]
+      }
+    },
+    {
+      "type": "function",
+      "name": "Animation_OscillateRotation",
+      "description": "Oscillate rotation",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "axis": {
+            "type": "array",
+            "items": { "type": "number" },
+            "minItems": 3,
+            "maxItems": 3
+          },
+          "amplitudeDeg": { "type": "number" },
+          "frequency": { "type": "number" },
+          "phase": { "type": "number" },
+          "channel": { "type": "string" }
+        },
+        "required": ["id", "axis"]
+      }
+    },
+    {
+      "type": "function",
+      "name": "Animation_Spin",
+      "description": "Spin continuously",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "axis": {
+            "type": "array",
+            "items": { "type": "number" },
+            "minItems": 3,
+            "maxItems": 3
+          },
+          "degPerSec": { "type": "number" },
+          "channel": { "type": "string" }
+        },
+        "required": ["id", "axis"]
+      }
+    },
+    {
+      "type": "function",
+      "name": "Animation_Stop",
+      "description": "Stop animations on channel",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "channel": { "type": "string" }
+        },
+        "required": ["id"]
+      }
+    }
+  ]
+}
