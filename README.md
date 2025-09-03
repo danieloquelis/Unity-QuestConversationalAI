@@ -8,6 +8,14 @@ This kit provides Unity packages for integrating OpenAI and ElevenLabs conversat
 
 ## Demos
 
+**ElevenLabs**
+
+https://github.com/user-attachments/assets/a6df1c2f-33d7-48e8-9f82-0c25c43c8e52
+
+**OpenAI Realtime API + Tools**
+
+https://github.com/user-attachments/assets/359bab0f-66f1-48a2-91aa-37e0007f8dcf
+
 ## Documentation
 
 ### OpenAI
