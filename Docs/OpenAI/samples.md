@@ -10,6 +10,8 @@ Sample scenes demonstrating different OpenAI real-time conversation capabilities
 
 Basic real-time conversation implementation with visual feedback.
 
+https://github.com/user-attachments/assets/a4f17a45-d40a-4a1f-8cf8-f1cc60617571
+
 **Features:**
 
 - Speech-to-speech conversation
@@ -27,6 +29,8 @@ Basic real-time conversation implementation with visual feedback.
 **Location**: `Assets/Samples/OpenAI/SimpleVoiceActionSample/`
 
 Voice-controlled actions with function calling.
+
+https://github.com/user-attachments/assets/b7cae009-da9b-437c-b876-b5a64e2ffd24
 
 **Features:**
 
@@ -52,6 +56,8 @@ Voice-controlled actions with function calling.
 
 Conversational AI with visual input capabilities.
 
+https://github.com/user-attachments/assets/fd5ff4bf-4af5-4e95-a876-ff79dc3d3bf5
+
 **Features:**
 
 - Camera integration
@@ -69,6 +75,10 @@ Conversational AI with visual input capabilities.
 **Location**: `Assets/Samples/OpenAI/AgenticToolsSample/`
 
 Advanced tool integration with mesh and line art generation.
+
+
+https://github.com/user-attachments/assets/00370cdf-7f4c-4b68-8d85-89843b6502ec
+
 
 **Scenes:**
 
