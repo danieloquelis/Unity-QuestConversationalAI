@@ -10,6 +10,8 @@ Sample scene demonstrating ElevenLabs conversational AI capabilities. Clone the 
 
 Complete conversational AI implementation with visual feedback.
 
+https://github.com/user-attachments/assets/eeea0708-3a50-4447-b2bf-48bb7fe19bbb
+
 **Features:**
 
 - Real-time speech-to-speech conversation
