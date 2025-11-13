@@ -4,6 +4,9 @@
   "version": "1.0.0",
   "unity": "6000.0",
   "description": "A Unity package that enables real-time conversational AI interactions using OpenAI's Realtime API.",
+  "dependencies": {
+    "com.unity.nuget.newtonsoft-json": "3.0.0"
+  },
   "author": {
     "name": "Daniel Oquelis",
     "email": "daniel.oquelis@gmail.com",

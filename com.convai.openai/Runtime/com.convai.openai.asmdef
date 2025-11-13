@@ -1,0 +1,17 @@
+{
+    "name": "com.convai.openai",
+    "rootNamespace": "OpenAI",
+    "references": [
+        "endel.nativewebsocket",
+        "Unity.Nuget.Newtonsoft-Json"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
