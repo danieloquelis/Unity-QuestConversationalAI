@@ -44,6 +44,7 @@ namespace OpenAI
 			}
 
 			var behaviours = target.GetComponents<MonoBehaviour>();
+
 			foreach (JObject spec in toolsArray.OfType<JObject>())
 			{
 				var name = spec["name"]?.ToString();
@@ -55,8 +56,8 @@ namespace OpenAI
 				MonoBehaviour owner = null;
 				foreach (var mb in behaviours)
 				{
-					var mi = mb.GetType().GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
-						.FirstOrDefault(m => string.Equals(m.Name, methodName, StringComparison.OrdinalIgnoreCase)
+					var methods = mb.GetType().GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+					var mi = methods.FirstOrDefault(m => string.Equals(m.Name, methodName, StringComparison.OrdinalIgnoreCase)
 							&& m.GetParameters().Length == 1 && m.GetParameters()[0].ParameterType == typeof(JObject));
 					if (mi != null) { found = mi; owner = mb; break; }
 				}

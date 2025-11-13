@@ -4,10 +4,22 @@ Unity package for integrating OpenAI's real-time conversation API into your Unit
 
 ## Installation
 
+### Prerequisites
+
+Before installing this package, you must add **NativeWebSocket** to your project:
+
+1. Open your project's `Packages/manifest.json` file
+2. Add the following to the `dependencies` section:
+```json
+"com.endel.nativewebsocket": "https://github.com/endel/NativeWebSocket.git#upm"
+```
+3. Save the file and return to Unity (it will auto-import)
+
 ### Via Unity Package Manager
 
 1. Open Unity Package Manager
 2. Add package from git URL: `https://github.com/danieloquelis/Unity-QuestConversationalAI.git?path=/com.convai.openai`
+3. Newtonsoft-Json will be installed automatically
 
 ## Setup
 
@@ -56,56 +68,47 @@ Prefab for managing custom tools that the AI can invoke during conversations.
 
 ## Custom Tools
 
-### Creating Custom Tools
+Custom tools let the AI perform actions in your scene. See the [Complete Tools Guide](tools.md) for detailed examples.
 
-Create a MonoBehaviour with public async Task<JObject> methods that match your tool names:
+### Quick Setup
 
+**1. Create a C# script with tool methods:**
 ```csharp
-public class MyCustomTool : MonoBehaviour
+using System.Threading.Tasks;
+using Newtonsoft.Json.Linq;
+using UnityEngine;
+
+public class MyTools : MonoBehaviour
 {
-    public async Task<JObject> MyTool_Action(JObject args)
+    // Method signature: public async Task<JObject> ToolName(JObject args)
+    public async Task<JObject> Light_TurnOn(JObject args)
     {
-        // Extract parameters from args
-        var value = args?.Value<string>("parameter");
-
-        // Perform your action
-        Debug.Log($"Tool called with: {value}");
-
-        // Return result
+        GetComponent<Light>().enabled = true;
         await Task.Yield();
-        return new JObject { ["success"] = true };
+        return new JObject { ["ok"] = true };
     }
 }
 ```
 
-### Tool Schema
-
-Create a JSON schema file defining your tools:
-
+**2. Create a JSON schema:**
 ```json
 {
-  "tools": [
-    {
-      "type": "function",
-      "name": "MyTool_Action",
-      "description": "Description of what this tool does",
-      "parameters": {
-        "type": "object",
-        "properties": {
-          "parameter": { "type": "string" }
-        },
-        "required": ["parameter"]
-      }
-    }
-  ]
+  "tools": [{
+    "type": "function",
+    "name": "Light_TurnOn",
+    "description": "Turn on the light",
+    "parameters": { "type": "object", "properties": {} }
+  }]
 }
 ```
 
-### Registering Tools
+**3. Wire up in Unity:**
+- Attach `MyTools` script to a GameObject
+- In `ToolBindings` component:
+  - Set `Tools Json` → your JSON file
+  - Set `Target` → GameObject with your script
 
-1. Assign your tool MonoBehaviour to the `AgentToolsBinding` prefab
-2. Reference your JSON schema file in the tool binding configuration
-3. The system will automatically detect and register methods matching the schema
+**See [tools.md](tools.md) for complete guide with patterns and troubleshooting.**
 
 ## Events
 

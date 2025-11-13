@@ -4,10 +4,22 @@ Unity package for integrating ElevenLabs' conversational AI with real-time speec
 
 ## Installation
 
+### Prerequisites
+
+Before installing this package, you must add **NativeWebSocket** to your project:
+
+1. Open your project's `Packages/manifest.json` file
+2. Add the following to the `dependencies` section:
+```json
+"com.endel.nativewebsocket": "https://github.com/endel/NativeWebSocket.git#upm"
+```
+3. Save the file and return to Unity (it will auto-import)
+
 ### Via Unity Package Manager
 
 1. Open Unity Package Manager
-2. Add package from git URL: `https://github.com/yourusername/Unity-QuestConversationalAI.git?path=/com.convai.elevenlabs`
+2. Add package from git URL: `https://github.com/danieloquelis/Unity-QuestConversationalAI.git?path=/com.convai.elevenlabs`
+3. Newtonsoft-Json will be installed automatically
 
 ## Setup
 

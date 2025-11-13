@@ -25,7 +25,7 @@ https://github.com/user-attachments/assets/359bab0f-66f1-48a2-91aa-37e0007f8dcf
 - [Installation](Docs/OpenAI/setup.md#installation)
 - [API Key Setup](Docs/OpenAI/setup.md#setup)
 - [Core Prefabs](Docs/OpenAI/setup.md#core-prefabs)
-- [Custom Tools](Docs/OpenAI/setup.md#custom-tools)
+- [Custom Tools Guide](Docs/OpenAI/tools.md)
 - [Events](Docs/OpenAI/setup.md#events)
 
 **Sample Scenes**
@@ -55,6 +55,16 @@ https://github.com/user-attachments/assets/359bab0f-66f1-48a2-91aa-37e0007f8dcf
 - **Unity**: 6000.0.53f1 (LTS)
 - **Meta SDK**: 77.0.0
 - **Platform**: Meta Quest, Unity PC
+
+### Dependencies
+
+Both packages require **NativeWebSocket**. Add to your `Packages/manifest.json`:
+
+```json
+"com.endel.nativewebsocket": "https://github.com/endel/NativeWebSocket.git#upm"
+```
+
+(Newtonsoft-Json is installed automatically by the packages)
 
 ## Troubleshooting
 
