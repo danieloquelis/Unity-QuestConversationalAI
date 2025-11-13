@@ -56,16 +56,6 @@ https://github.com/user-attachments/assets/359bab0f-66f1-48a2-91aa-37e0007f8dcf
 - **Meta SDK**: 77.0.0
 - **Platform**: Meta Quest, Unity PC
 
-### Dependencies
-
-Both packages require **NativeWebSocket**. Add to your `Packages/manifest.json`:
-
-```json
-"com.endel.nativewebsocket": "https://github.com/endel/NativeWebSocket.git#upm"
-```
-
-(Newtonsoft-Json is installed automatically by the packages)
-
 ## Troubleshooting
 
 **Meta SDK 78 Issue**: Meta SDK 78 has an issue with microphone permissions. I am working on it. Please use Meta SDK 77.0.0 for now.
