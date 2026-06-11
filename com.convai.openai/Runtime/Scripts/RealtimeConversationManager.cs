@@ -508,7 +508,7 @@ namespace OpenAI
             var headers = new Dictionary<string, string>
             {
                 { "Authorization", $"Bearer {config.apiKey}" },
-                { "OpenAI-Beta",   "realtime=v1" }
+                { "OpenAI",   "realtime=v1" }
             };
             _ws = new WebSocket(url, headers);
         }

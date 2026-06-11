@@ -44,14 +44,17 @@ MonoBehaviour:
   m_GameObject: {fileID: 5070867449222754458}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2a66724f5822240eda12c608e5f599d9, type: 3}
+  m_Script: {fileID: 11500000, guid: 18038149ebbd5419aa594b8aa390dc73, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  agentId: 
+  agentId: <your_agent_id>
   startOnAwake: 1
   config: {fileID: 0}
   micStreamer: {fileID: 831340019275806646}
   audioPlayer: {fileID: 8068899441653360327}
+  onAgentVadScore:
+    m_PersistentCalls:
+      m_Calls: []
   onAgentTranscript:
     m_PersistentCalls:
       m_Calls: []
@@ -67,7 +70,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 5070867449222754458}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: abb451e65179f4585baf91710be5f86f, type: 3}
+  m_Script: {fileID: 11500000, guid: d40017e6329884fb9912415708ca08b6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!114 &8068899441653360327
@@ -79,10 +82,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 5070867449222754458}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ea3d8f889b91147259195f60869c174f, type: 3}
+  m_Script: {fileID: 11500000, guid: 58cf1ee37bdc148f8ab45087ce117b2d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   audioSource: {fileID: 6002203364098092144}
+  sampleRate: 16000
 --- !u!82 &6002203364098092144
 AudioSource:
   m_ObjectHideFlags: 0
