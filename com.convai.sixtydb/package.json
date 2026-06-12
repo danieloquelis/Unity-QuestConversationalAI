@@ -1,0 +1,22 @@
+{
+  "name": "com.convai.sixtydb",
+  "displayName": "ConversationalAI [60db]",
+  "version": "1.0.0",
+  "unity": "6000.0",
+  "description": "A Unity package that enables real-time conversational AI interactions by composing 60db's STT WebSocket, LLM chat completions, and TTS WebSocket into a single Quest-friendly conversation manager. Mirrors the surface of com.convai.elevenlabs and com.convai.openai.",
+  "dependencies": {
+    "com.unity.nuget.newtonsoft-json": "3.0.0"
+  },
+  "author": {
+    "name": "Daniel Oquelis",
+    "email": "daniel.oquelis@gmail.com",
+    "url": "https://github.com/danieloquelis"
+  },
+  "samples": [
+    {
+      "displayName": "Conversational AI Samples",
+      "description": "Please clone the main repository to access to samples",
+      "path": "Samples~/ConversationalSample"
+    }
+  ]
+}
