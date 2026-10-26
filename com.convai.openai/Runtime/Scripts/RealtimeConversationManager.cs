@@ -196,22 +196,27 @@ namespace OpenAI
                     break;
 
                 case "conversation.item.created":
+                case "conversation.item.added":
                     HandleConversationItemCreated();
                     break;
 
                 case "response.audio.delta":
+                case "response.output_audio.delta":
                     HandleResponseAudioDelta(text);
                     break;
 
                 case "response.audio.done":
+                case "response.output_audio.done":
                     HandleResponseAudioDone();
                     break;
 
                 case "response.audio_transcript.delta":
+                case "response.output_audio_transcript.delta":
                     HandleResponseTranscriptDelta(text);
                     break;
 
                 case "response.audio_transcript.done":
+                case "response.output_audio_transcript.done":
                 case "response.content_part.added":
                 case "response.content_part.done":
                     HandleNoop();
@@ -275,20 +280,60 @@ namespace OpenAI
 
         private void SendSessionUpdate()
         {
-            // server VAD on, but we create responses ourselves at speech stop
-            var session = new JObject
+            JObject session;
+
+            if (IsBetaModel)
             {
-                ["instructions"] = systemPrompt ?? string.Empty,
-                ["modalities"]   = new JArray("text", "audio"),
-                ["voice"]        = ResolveVoiceString(),
-                ["input_audio_transcription"] = new JObject { ["model"] = "gpt-4o-mini-transcribe" },
-                ["turn_detection"] = new JObject
+                // Legacy OpenAI Realtime Beta / Preview schema (e.g. gpt-4o-realtime-preview)
+                session = new JObject
                 {
-                    ["type"] = "server_vad",
-                    ["create_response"] = false
-                },
-                ["tools"] = AgentToolRegistry.GetToolsSpec()
-            };
+                    ["instructions"] = systemPrompt ?? string.Empty,
+                    ["modalities"]   = new JArray("text", "audio"),
+                    ["voice"]        = ResolveVoiceString(),
+                    ["input_audio_transcription"] = new JObject { ["model"] = "gpt-4o-mini-transcribe" },
+                    ["turn_detection"] = new JObject
+                    {
+                        ["type"] = "server_vad",
+                        ["create_response"] = false
+                    },
+                    ["tools"] = AgentToolRegistry.GetToolsSpec()
+                };
+            }
+            else
+            {
+                // OpenAI Realtime GA schema (e.g. gpt-realtime, gpt-realtime-mini)
+                // 1. session.type must be explicitly declared as "realtime".
+                // 2. Modalities array is omitted (session.type: "realtime" defaults to text + audio).
+                // 3. Audio input and output configurations are structured under "audio" (PCM 24kHz).
+                session = new JObject
+                {
+                    ["type"]         = "realtime",
+                    ["instructions"] = systemPrompt ?? string.Empty,
+                    ["audio"] = new JObject
+                    {
+                        ["input"] = new JObject
+                        {
+                            ["format"] = new JObject { ["type"] = "audio/pcm", ["rate"] = 24000 },
+                            ["transcription"] = new JObject { ["model"] = "whisper-1" },
+                            ["turn_detection"] = new JObject
+                            {
+                                ["type"] = "server_vad",
+                                ["threshold"] = 0.5,
+                                ["prefix_padding_ms"] = 300,
+                                ["silence_duration_ms"] = 500,
+                                ["create_response"] = false,
+                                ["interrupt_response"] = true
+                            }
+                        },
+                        ["output"] = new JObject
+                        {
+                            ["format"] = new JObject { ["type"] = "audio/pcm", ["rate"] = 24000 },
+                            ["voice"] = ResolveVoiceString()
+                        }
+                    },
+                    ["tools"] = AgentToolRegistry.GetToolsSpec()
+                };
+            }
 
             var upd = new JObject { ["type"] = "session.update", ["session"] = session };
             _ = _ws.SendText(upd.ToString(Formatting.None));
@@ -502,14 +547,23 @@ namespace OpenAI
 
         #region Socket helpers
 
+        private bool IsBetaModel => !string.IsNullOrEmpty(model) && model.IndexOf("preview", StringComparison.OrdinalIgnoreCase) >= 0;
+
         private void InitializeWebSocket()
         {
             var url = $"{config.realtimeConvWebsocketUrl}?model={Uri.EscapeDataString(model)}";
             var headers = new Dictionary<string, string>
             {
-                { "Authorization", $"Bearer {config.apiKey}" },
-                { "OpenAI-Beta",   "realtime=v1" }
+                { "Authorization", $"Bearer {config.apiKey}" }
             };
+
+            // Beta preview models (e.g. gpt-4o-realtime-preview) require the OpenAI-Beta header.
+            // GA production models (e.g. gpt-realtime, gpt-realtime-mini) should not include it.
+            if (IsBetaModel)
+            {
+                headers["OpenAI-Beta"] = "realtime=v1";
+            }
+
             _ws = new WebSocket(url, headers);
         }
 

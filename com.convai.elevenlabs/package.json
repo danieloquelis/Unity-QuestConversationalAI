@@ -1,7 +1,7 @@
 {
   "name": "com.convai.elevenlabs",
   "displayName": "ConversationalAI [ElevenLabs]",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "unity": "6000.0",
   "description": "A Unity package that enables real-time conversational AI interactions using ElevenLabs' Realtime API.",
   "dependencies": {
